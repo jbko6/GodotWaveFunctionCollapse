@@ -1,0 +1,82 @@
+[gd_scene load_steps=11 format=3 uid="uid://0u1kqwi6x3d2"]
+
+[ext_resource type="Script" path="res://scripts/grid/wave_function_collapse/WFCPossibilityDebug.gd" id="1_w11ek"]
+[ext_resource type="Script" path="res://addons/orbit_camera/orbit_camera.gd" id="2_0uss4"]
+
+[sub_resource type="Environment" id="Environment_e5ly3"]
+background_mode = 1
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_we1w7"]
+transparency = 1
+shading_mode = 0
+albedo_color = Color(1, 1, 1, 0.0235294)
+
+[sub_resource type="BoxMesh" id="BoxMesh_n81c5"]
+material = SubResource("StandardMaterial3D_we1w7")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ogdel"]
+albedo_color = Color(0.490982, 0.760468, 1, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_oteh8"]
+size = Vector3(0.1, 0.1, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cmbwc"]
+albedo_color = Color(0, 0.259633, 0.434134, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_um448"]
+albedo_color = Color(1, 0.280513, 0.365941, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kdg7i"]
+albedo_color = Color(0.482616, 0, 0.110305, 1)
+
+[node name="Debug" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_e5ly3")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
+transform = Transform3D(0.721796, -0.34124, 0.602134, 0, 0.870003, 0.493046, -0.692106, -0.355879, 0.627965, 0, 0, 0)
+
+[node name="WFCPossibilityDebug" type="Node3D" parent="."]
+script = ExtResource("1_w11ek")
+prototype_data_json = "res://prototypes/prototype_data.json"
+possibility_data_json = "res://prototypes/prototype_possibility_data.json"
+mesh_folder = "res://prototypes/Meshes"
+
+[node name="Center" type="Node3D" parent="."]
+transform = Transform3D(1, -0.000158186, 0.000175231, 0.00015823, 1, -0.000207269, -0.000175191, 0.000207303, 1, 0, 0, 0)
+
+[node name="RotationNode" type="Node3D" parent="Center"]
+
+[node name="OrbitCamera" type="Camera3D" parent="Center/RotationNode"]
+script = ExtResource("2_0uss4")
+SCROLL_SPEED = 30.0
+DEFAULT_DISTANCE = 10.0
+ROTATE_SPEED = 1.0
+ANCHOR_NODE_PATH = NodePath("..")
+MOUSE_ZOOM_SPEED = 30.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_n81c5")
+
+[node name="Z+" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, 0.25)
+material_override = SubResource("StandardMaterial3D_ogdel")
+mesh = SubResource("BoxMesh_oteh8")
+
+[node name="Z-" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.5, -0.25)
+material_override = SubResource("StandardMaterial3D_cmbwc")
+mesh = SubResource("BoxMesh_oteh8")
+
+[node name="X+" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.25, -0.5, -1.09278e-08)
+material_override = SubResource("StandardMaterial3D_um448")
+mesh = SubResource("BoxMesh_oteh8")
+
+[node name="X-" type="MeshInstance3D" parent="."]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -0.25, -0.5, 1.09278e-08)
+material_override = SubResource("StandardMaterial3D_kdg7i")
+mesh = SubResource("BoxMesh_oteh8")

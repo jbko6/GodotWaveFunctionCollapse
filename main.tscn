@@ -1,0 +1,97 @@
+[gd_scene load_steps=15 format=3 uid="uid://kcnc7kjlauts"]
+
+[ext_resource type="Script" path="res://scripts/grid/GridManager.gd" id="1_25s0q"]
+[ext_resource type="Script" path="res://scripts/grid/DebugGridRenderer.gd" id="2_4juqo"]
+[ext_resource type="Script" path="res://addons/orbit_camera/orbit_camera.gd" id="3_6by7y"]
+[ext_resource type="Script" path="res://scripts/grid/GridInputManager.gd" id="3_l26ft"]
+[ext_resource type="Script" path="res://scripts/grid/GridCollisionManager.gd" id="4_7g12r"]
+[ext_resource type="Script" path="res://scripts/grid/wave_function_collapse/WFCGridRendererV2.gd" id="5_7ecwb"]
+[ext_resource type="Script" path="res://scripts/grid/wave_function_collapse/WFCGridDebugRenderer.gd" id="6_4vpgi"]
+[ext_resource type="Script" path="res://scripts/grid/wave_function_collapse/WFCGridDebugInput.gd" id="7_yppd4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tl6lx"]
+shading_mode = 0
+albedo_color = Color(1, 0, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_8pq2s"]
+radius = 0.05
+height = 0.1
+
+[sub_resource type="Environment" id="Environment_360mx"]
+background_mode = 1
+ambient_light_source = 2
+ambient_light_color = Color(1, 1, 1, 1)
+
+[sub_resource type="WorldBoundaryShape3D" id="WorldBoundaryShape3D_abfax"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oc8l2"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.0156863)
+
+[sub_resource type="BoxMesh" id="BoxMesh_kni66"]
+size = Vector3(9, 3, 9)
+
+[node name="Node3D" type="Node3D"]
+
+[node name="GridManager" type="Node3D" parent="." node_paths=PackedStringArray("renderers", "collision_manager")]
+script = ExtResource("1_25s0q")
+GRID_DIMENSIONS = Vector3(9, 1, 9)
+renderers = [NodePath("DebugRenderer"), NodePath("WFCRenderer"), NodePath("WFCDebugRenderer")]
+collision_manager = NodePath("CollisionManager")
+
+[node name="DebugRenderer" type="Node3D" parent="GridManager"]
+visible = false
+script = ExtResource("2_4juqo")
+
+[node name="InputManager" type="MeshInstance3D" parent="GridManager"]
+material_override = SubResource("StandardMaterial3D_tl6lx")
+mesh = SubResource("SphereMesh_8pq2s")
+script = ExtResource("3_l26ft")
+
+[node name="CollisionManager" type="StaticBody3D" parent="GridManager"]
+script = ExtResource("4_7g12r")
+
+[node name="WFCRenderer" type="Node3D" parent="GridManager"]
+script = ExtResource("5_7ecwb")
+prototype_data_json = "res://prototypes/prototype_data.json"
+prototype_possibility_data_json = "res://prototypes/prototype_possibility_data.json"
+mesh_folder = "res://prototypes/Meshes"
+
+[node name="WFCDebugRenderer" type="Node3D" parent="GridManager" node_paths=PackedStringArray("wfc")]
+script = ExtResource("6_4vpgi")
+wfc = NodePath("../WFCRenderer")
+
+[node name="WFCDebugInput" type="Node3D" parent="GridManager/WFCDebugRenderer" node_paths=PackedStringArray("wfc")]
+script = ExtResource("7_yppd4")
+wfc = NodePath("../../WFCRenderer")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_360mx")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="WorldEnvironment"]
+transform = Transform3D(0.884214, 0, 0.467081, -0.209949, 0.893285, 0.397446, -0.417237, -0.449491, 0.789856, 0, 0, 0)
+
+[node name="Center" type="Node3D" parent="."]
+transform = Transform3D(1, -0.000158186, 0.000175231, 0.00015823, 1, -0.000207269, -0.000175191, 0.000207303, 1, 4, 0, 4)
+
+[node name="RotationNode" type="Node3D" parent="Center"]
+
+[node name="OrbitCamera" type="Camera3D" parent="Center/RotationNode"]
+script = ExtResource("3_6by7y")
+SCROLL_SPEED = 30.0
+DEFAULT_DISTANCE = 10.0
+ROTATE_SPEED = 1.0
+ANCHOR_NODE_PATH = NodePath("..")
+MOUSE_ZOOM_SPEED = 30.0
+
+[node name="Boundaries" type="StaticBody3D" parent="."]
+
+[node name="Floor" type="CollisionShape3D" parent="Boundaries"]
+shape = SubResource("WorldBoundaryShape3D_abfax")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4, 1, 4)
+material_override = SubResource("StandardMaterial3D_oc8l2")
+mesh = SubResource("BoxMesh_kni66")
+
+[connection signal="user_set_cell" from="GridManager/InputManager" to="GridManager" method="set_cell_world_pos"]
